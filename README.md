@@ -27,16 +27,27 @@ permitan visualizar el funcionamiento de la curva ADSR.
 
 * Un instrumento con una envolvente ADSR genérica, para el que se aprecie con claridad cada uno de sus
   parámetros: ataque (A), caída (D), mantenimiento (S) y liberación (R).
+
+<img src ="Grafica1.png" witdh="640" align="center">
+
 * Un instrumento *percusivo*, como una guitarra o un piano, en el que el sonido tenga un ataque rápido, no
   haya mantenimiemto y el sonido se apague lentamente.
   - Para un instrumento de este tipo, tenemos dos situaciones posibles:
     * El intérprete mantiene la nota *pulsada* hasta su completa extinción.
+
+<img src ="Grafica2.png" witdh="640" align="center">
+
     * El intérprete da por finalizada la nota antes de su completa extinción, iniciándose una disminución
 	  abrupta del sonido hasta su finalización.
+
+<img src ="Grafica3.png" witdh="640" align="center">
+
   - Debera representar en esta memoria **ambos** posibles finales de la nota.
 * Un instrumento *plano*, como los de cuerdas frotadas (violines y semejantes) o algunos de viento. En
   ellos, el ataque es relativamente rápido hasta alcanzar el nivel de mantenimiento (sin sobrecarga), y la
   liberación también es bastante rápida.
+
+<img src ="Grafica4.png" witdh="640" align="center">
 
 Para los cuatro casos, deberá incluir una gráfica en la que se visualice claramente la curva ADSR. Deberá
 añadir la información necesaria para su correcta interpretación, aunque esa información puede reducirse a
@@ -48,6 +59,94 @@ Implemente el instrumento `Seno` tomando como modelo el `InstrumentDumb`. La se�
 mediante búsqueda de los valores en una tabla.
 
 - Incluya, a continuación, el código del fichero `seno.cpp` con los métodos de la clase Seno.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+#include <iostream>
+#include <math.h>
+#include "seno.h"
+#include "keyvalue.h"
+#include <stdlib.h>
+
+using namespace upc;
+using namespace std;
+
+InstrumentDumb::InstrumentDumb(const std::string &param) 
+  : adsr(SamplingRate, param) {
+  bActive = false;
+  x.resize(BSIZE);
+
+  /*
+    You can use the class keyvalue to parse "param" and configure your instrument.
+    Take a Look at keyvalue.h    
+  */
+  KeyValue kv(param);
+  int N;
+
+  if (!kv.to_int("N",N))
+    N = 40; //default value
+  
+  //Create a tbl with one period of a sinusoidal wave
+  tbl.resize(N);
+  float phase = 0, step = 2 * M_PI /(float) N;
+  index = 0;
+  for (int i=0; i < N ; ++i) {
+    tbl[i] = sin(phase);
+    phase += step;
+  }
+}
+
+
+void InstrumentDumb::command(long cmd, long note, long vel) {
+ 
+ f0 = 440*pow(2,(note - 69.)/12);
+
+  if (cmd == 9) {		//'Key' pressed: attack begins
+    bActive = true;
+    adsr.start();
+    index = 0;
+	
+    phas = 0;
+    increment = ((f0/SamplingRate)*tbl.size());
+    a = vel /127;
+    phas = 0;
+
+  }
+  else if (cmd == 8) {	//'Key' released: sustain ends, release begins
+    adsr.stop();
+  }
+  else if (cmd == 0) {	//Sound extinguished without waiting for release to end
+    adsr.end();
+  }
+}
+
+
+const vector<float> & InstrumentDumb::synthesize() {
+  if (not adsr.active()) {
+    x.assign(x.size(), 0);
+    bActive = false;
+    return x;
+  }
+  else if (not bActive)
+    return x;
+
+FILE *fp;
+fp= fopen("xvector.log","a");
+
+  for (unsigned int i=0; i<x.size(); ++i) {
+    phas+=increment;  
+    x[i] = A * tbl[round(phas)];
+    fprintf(fp,"%f\n",x[i]);
+        while(phas>=tbl.size()) phas -= tbl.size();
+    
+    if (index == tbl.size())
+      index = 0;
+  }
+  adsr(x); //apply envelope to x and update internal status of ADSR
+    fclose(fp);
+  return x;
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 - Explique qué método se ha seguido para asignar un valor a la señal a partir de los contenidos en la tabla,
   e incluya una gráfica en la que se vean claramente (use pelotitas en lugar de líneas) los valores de la
   tabla y los de la señal generada.
