@@ -28,26 +28,26 @@ permitan visualizar el funcionamiento de la curva ADSR.
 * Un instrumento con una envolvente ADSR genérica, para el que se aprecie con claridad cada uno de sus
   parámetros: ataque (A), caída (D), mantenimiento (S) y liberación (R).
 
-<img src ="Grafica1.png" witdh="640" align="center">
+<img src ="img/Grafica1.png" witdh="640" align="center">
 
 * Un instrumento *percusivo*, como una guitarra o un piano, en el que el sonido tenga un ataque rápido, no
   haya mantenimiemto y el sonido se apague lentamente.
   - Para un instrumento de este tipo, tenemos dos situaciones posibles:
     * El intérprete mantiene la nota *pulsada* hasta su completa extinción.
 
-<img src ="Grafica2.png" witdh="640" align="center">
+<img src ="img/Grafica2.png" witdh="640" align="center">
 
     * El intérprete da por finalizada la nota antes de su completa extinción, iniciándose una disminución
 	  abrupta del sonido hasta su finalización.
 
-<img src ="Grafica3.png" witdh="640" align="center">
+<img src ="img/Grafica3.png" witdh="640" align="center">
 
   - Debera representar en esta memoria **ambos** posibles finales de la nota.
 * Un instrumento *plano*, como los de cuerdas frotadas (violines y semejantes) o algunos de viento. En
   ellos, el ataque es relativamente rápido hasta alcanzar el nivel de mantenimiento (sin sobrecarga), y la
   liberación también es bastante rápida.
 
-<img src ="Grafica4.png" witdh="640" align="center">
+<img src ="img/Grafica4.png" witdh="640" align="center">
 
 Para los cuatro casos, deberá incluir una gráfica en la que se visualice claramente la curva ADSR. Deberá
 añadir la información necesaria para su correcta interpretación, aunque esa información puede reducirse a
@@ -65,12 +65,13 @@ mediante búsqueda de los valores en una tabla.
 #include <math.h>
 #include "seno.h"
 #include "keyvalue.h"
+
 #include <stdlib.h>
 
 using namespace upc;
 using namespace std;
 
-InstrumentDumb::InstrumentDumb(const std::string &param) 
+Instrumentseno::Instrumentseno(const std::string &param) 
   : adsr(SamplingRate, param) {
   bActive = false;
   x.resize(BSIZE);
@@ -81,35 +82,41 @@ InstrumentDumb::InstrumentDumb(const std::string &param)
   */
   KeyValue kv(param);
   int N;
+FILE * f = fopen("tblfile.log","a");
 
   if (!kv.to_int("N",N))
     N = 40; //default value
-  
+
   //Create a tbl with one period of a sinusoidal wave
   tbl.resize(N);
   float phase = 0, step = 2 * M_PI /(float) N;
   index = 0;
   for (int i=0; i < N ; ++i) {
-    tbl[i] = sin(phase);
+    tbl[i] = sin(phase);;
+    fprintf(f,"%f\n",tbl[i]);
     phase += step;
   }
+fclose(f);
 }
 
 
-void InstrumentDumb::command(long cmd, long note, long vel) {
- 
- f0 = 440*pow(2,(note - 69.)/12);
+void Instrumentseno::command(long cmd, long note, long vel) {
 
+f0 = 440*pow(2,(note - 69.)/12);
+//fprintf(stdout,"f0-->%f\n",f0);
   if (cmd == 9) {		//'Key' pressed: attack begins
     bActive = true;
     adsr.start();
     index = 0;
-	
-    phas = 0;
-    increment = ((f0/SamplingRate)*tbl.size());
-    a = vel /127;
-    phas = 0;
-
+	phas = 0;
+//	increment = 10*(f0/(SamplingRate/tbl.size()));
+//	increment = 2 * M_PI * (f0/SamplingRate);
+	increment = ((f0 / SamplingRate) * tbl.size());
+//	increment = SamplingRate / (f0) ;
+//	fprintf(stdout,"increment-->%d\n",increment);
+//	fprintf(stdout,"tblsize-->%d\n",tbl.size());
+	A = vel / 127.;
+	phas = 0;
   }
   else if (cmd == 8) {	//'Key' released: sustain ends, release begins
     adsr.stop();
@@ -120,7 +127,7 @@ void InstrumentDumb::command(long cmd, long note, long vel) {
 }
 
 
-const vector<float> & InstrumentDumb::synthesize() {
+const vector<float> & Instrumentseno::synthesize() {
   if (not adsr.active()) {
     x.assign(x.size(), 0);
     bActive = false;
@@ -128,21 +135,24 @@ const vector<float> & InstrumentDumb::synthesize() {
   }
   else if (not bActive)
     return x;
-
-FILE *fp;
-fp= fopen("xvector.log","a");
-
+FILE * fp;
+fp = fopen("xvector.log","a");
   for (unsigned int i=0; i<x.size(); ++i) {
-    phas+=increment;  
-    x[i] = A * tbl[round(phas)];
-    fprintf(fp,"%f\n",x[i]);
-        while(phas>=tbl.size()) phas -= tbl.size();
-    
-    if (index == tbl.size())
-      index = 0;
+
+	phas = phas + increment;
+
+	x[i] = A * tbl[round(phas)];
+
+
+//Amb interpolació
+//x[i] =tbl[floor(phas)]+(phas-floor(phas))*(tbl[floor(phas+1)]-tbl[floor(phas)])/(floor(phas+1)-floor(phas));
+
+fprintf(fp,"%f\n",x[i]);
+	 while(phas >= tbl.size()) phas = phas - tbl.size();
+
   }
   adsr(x); //apply envelope to x and update internal status of ADSR
-    fclose(fp);
+fclose(fp);
   return x;
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -150,6 +160,17 @@ fp= fopen("xvector.log","a");
 - Explique qué método se ha seguido para asignar un valor a la señal a partir de los contenidos en la tabla,
   e incluya una gráfica en la que se vean claramente (use pelotitas en lugar de líneas) los valores de la
   tabla y los de la señal generada.
+
+Hemos sacado la frecuencia fundamental usando la expresion: **f0= 440*pow(2,(note-69)/12)**. Como la tabla del seno se puede recorrer
+a una diferente velocidad, nos permite modificar la frecuencia del seno para obtener la fase en función de dicha frecuencia fundamental.
+
+Tenemos que la expresión es: **(f0/SamplingRate)*tbl.size()**
+
+En la gráfica se puede observar el muestreado obtenido con la interpolación y el obtenido al recorrer la tabla del seno.
+
+<img src ="img/Seno.png" witdh="640" align="center">
+
+
 - Si ha implementado la síntesis por tabla almacenada en fichero externo, incluya a continuación el código
   del método `command()`.
 
