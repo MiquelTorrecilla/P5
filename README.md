@@ -180,6 +180,24 @@ En la gráfica se puede observar el muestreado obtenido con la interpolación y 
   sinusoidal. Deberá explicar detalladamente cómo se manifiestan los parámetros del efecto (frecuencia e
   índice de modulación) en la señal generada (se valorará que la explicación esté contenida en las propias
   gráficas, sin necesidad de *literatura*).
+
+  *Esta es la señal sin ningún introducirle ningún efecto:*
+
+<img src ="img/Dumb.png" witdh="640" align="center">
+
+*Señal con el efecto tremolo:*
+
+<img src ="img/Tremolo.png" witdh="640" align="center">
+
+*En la primera nota (DO) no se aplica pero a partir de la segunda nota (RE) vemos como la forma de la señal cambia radicalmente. Si la escuchamos tambien se aprecia un cambio.*
+
+*Señal con el efecto vibrato:*
+
+<img src ="img/Vibrato.png" witdh="640" align="center">
+
+*En este caso no se aprecia tan rápido que hemos aplicado un efecto al mirar la forma de la señal pero si nos fijamos podemos apreciar un cambios en la frecuencia a partir de la segunda nota (RE). Esto provoca, que si la reporducimos, haya variacones del pitch a medida que se va pasando por cada una de las notas de la escala.*
+
+
 - Si ha generado algún efecto por su cuenta, explique en qué consiste, cómo lo ha implementado y qué
   resultado ha producido. Incluya, en el directorio `work/ejemplos`, los ficheros necesarios para apreciar
   el efecto, e indique, a continuación, la orden necesaria para generar los ficheros de audio usando el
