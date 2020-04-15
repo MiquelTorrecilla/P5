@@ -109,12 +109,7 @@ f0 = 440*pow(2,(note - 69.)/12);
     adsr.start();
     index = 0;
 	phas = 0;
-//	increment = 10*(f0/(SamplingRate/tbl.size()));
-//	increment = 2 * M_PI * (f0/SamplingRate);
 	increment = ((f0 / SamplingRate) * tbl.size());
-//	increment = SamplingRate / (f0) ;
-//	fprintf(stdout,"increment-->%d\n",increment);
-//	fprintf(stdout,"tblsize-->%d\n",tbl.size());
 	A = vel / 127.;
 	phas = 0;
   }
@@ -160,14 +155,14 @@ fclose(fp);
 - Explique qué método se ha seguido para asignar un valor a la señal a partir de los contenidos en la tabla,
   e incluya una gráfica en la que se vean claramente (use pelotitas en lugar de líneas) los valores de la
   tabla y los de la señal generada.
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
 Hemos sacado la frecuencia fundamental usando la expresion: **f0= 440*pow(2,(note-69)/12)**. Como la tabla del seno se puede recorrer
 a una diferente velocidad, nos permite modificar la frecuencia del seno para obtener la fase en función de dicha frecuencia fundamental.
 
 Tenemos que la expresión es: **(f0/SamplingRate)*tbl.size()**
 
 En la gráfica se puede observar el muestreado obtenido con la interpolación y el obtenido al recorrer la tabla del seno.
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 <img src ="img/Seno.png" witdh="640" align="center">
 
 
@@ -180,23 +175,29 @@ En la gráfica se puede observar el muestreado obtenido con la interpolación y 
   sinusoidal. Deberá explicar detalladamente cómo se manifiestan los parámetros del efecto (frecuencia e
   índice de modulación) en la señal generada (se valorará que la explicación esté contenida en las propias
   gráficas, sin necesidad de *literatura*).
-
-  *Esta es la señal sin ningún introducirle ningún efecto:*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+  Esta es la señal sin ningún introducirle ningún efecto:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 <img src ="img/Dumb.png" witdh="640" align="center">
 
-*Señal con el efecto tremolo:*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+Señal con el efecto tremolo:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 <img src ="img/Tremolo.png" witdh="640" align="center">
 
-*En la primera nota (DO) no se aplica pero a partir de la segunda nota (RE) vemos como la forma de la señal cambia radicalmente. Si la escuchamos tambien se aprecia un cambio.*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+En la primera nota (DO) no se aplica pero a partir de la segunda nota (RE) vemos como la forma de la señal cambia radicalmente. Si la escuchamos tambien se aprecia un cambio.
 
-*Señal con el efecto vibrato:*
+Señal con el efecto vibrato:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 <img src ="img/Vibrato.png" witdh="640" align="center">
 
-*En este caso no se aprecia tan rápido que hemos aplicado un efecto al mirar la forma de la señal pero si nos fijamos podemos apreciar un cambios en la frecuencia a partir de la segunda nota (RE). Esto provoca, que si la reporducimos, haya variacones del pitch a medida que se va pasando por cada una de las notas de la escala.*
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+En este caso no se aprecia tan rápido que hemos aplicado un efecto al mirar la forma de la señal pero si nos fijamos podemos apreciar un cambios en la frecuencia a partir de la segunda nota (RE). Esto provoca, que si la reporducimos, haya variacones del pitch a medida que se va pasando por cada una de las notas de la escala.*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Si ha generado algún efecto por su cuenta, explique en qué consiste, cómo lo ha implementado y qué
   resultado ha producido. Incluya, en el directorio `work/ejemplos`, los ficheros necesarios para apreciar
@@ -222,8 +223,9 @@ deberá venir expresado en semitonos.
     ejemplo, violines, pianos, percusiones, espadas láser de la
 	[Guerra de las Galaxias](https://www.starwars.com/), etc.
 
-  *En la carpeta doremi hemos añadido varios intrumentos como violines, clarinetes, campanas y un chello.*
-  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+En la carpeta doremi hemos añadido varios intrumentos como violines, clarinetes, campanas y un chello.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 
 ### Orquestación usando el programa synth.
 
@@ -237,10 +239,12 @@ Use el programa `synth` para generar canciones a partir de su partitura MIDI. Co
 - Indique, a continuación, la orden necesaria para generar la señal (suponiendo que todos los archivos
   necesarios están en directorio indicado).
 
-  *Desde la carpeta work podemos usar este comando para que nos genere el archivo.wav*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+  Desde la carpeta work podemos usar este comando para que nos genere el archivo.wav
 
   **synth dumb.orc ../samples/ToyStory_A_Friend_in_me.sco ToyStory_A_Friend_in_me.wav**
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 También puede orquestar otros temas más complejos, como la banda sonora de *Hawaii5-0* o el villacinco de
 John Lennon *Happy Xmas (War Is Over)* (fichero `The_Christmas_Song_Lennon.sco`), o cualquier otra canción
 de su agrado o composición. Se valorará la riqueza instrumental, su modelado y el resultado final.
